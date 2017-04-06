@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     Gson gson;
     String apiKey = "naqiA2sdihu1iBA6uYB4GYXHBCAvpDRO";
     EditText et_city,et_country;
+    boolean set= false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,10 +92,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        final View view = getLayoutInflater().inflate(R.layout.alert_set_city,null);
+
 
                         builder.setTitle("Enter city details")
-                        .setView(getLayoutInflater().inflate(R.layout.alert_set_city,null))
-                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        .setView(view)
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d("demo","Cancel clicked");
@@ -103,8 +106,10 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d("demo","Set clicked");
-                                et_city = (EditText) findViewById(R.id.alert_city_name);
-                                et_country = (EditText) findViewById(R.id.alert_country_name);
+                                et_city = (EditText) view.findViewById(R.id.alert_city_name);
+                                et_country = (EditText) view.findViewById(R.id.alert_country_name);
+
+
                                 cityName = et_city.getText().toString().trim();
                                 countryCode = et_country.getText().toString().trim();
 
@@ -140,9 +145,11 @@ public class MainActivity extends AppCompatActivity {
                                             editor.putString("COUNTRY_CODE", countryCode);
                                             editor.putString("CITY_KEY", cityKey);
                                             editor.apply();
-                                            Toast.makeText(MainActivity.this, "Current city details saved", Toast.LENGTH_SHORT).show();
+                                            set = true;
+
                                         }else{
-                                            Toast.makeText(MainActivity.this, "City not found", Toast.LENGTH_SHORT).show();
+                                            set=false;
+
                                         }
 
                                     }
@@ -155,6 +162,11 @@ public class MainActivity extends AppCompatActivity {
                         builder.create().show();
                     }
                 });
+                if(set){
+                    Toast.makeText(MainActivity.this, "Current city details saved", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this, "City not found", Toast.LENGTH_SHORT).show();
+                }
             }
         }catch(NullPointerException e){
             e.printStackTrace();
