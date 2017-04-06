@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     Gson gson;
     String apiKey = "naqiA2sdihu1iBA6uYB4GYXHBCAvpDRO";
     EditText et_city,et_country;
-    boolean set= false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,10 +144,7 @@ public class MainActivity extends AppCompatActivity {
                                             editor.putString("COUNTRY_CODE", countryCode);
                                             editor.putString("CITY_KEY", cityKey);
                                             editor.apply();
-                                            set = true;
 
-                                        }else{
-                                            set=false;
 
                                         }
 
@@ -156,17 +152,20 @@ public class MainActivity extends AppCompatActivity {
                                 });
 
                                 pg.dismiss();
-                     }
-                        });
+                                if(cityKey!=null || !(cityKey.equals(""))){
+                                    Toast.makeText(MainActivity.this, "Current city details saved", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(MainActivity.this, "City not found", Toast.LENGTH_SHORT).show();
+                                }
+
+                        }
+                                           });
 
                         builder.create().show();
+
                     }
                 });
-                if(set){
-                    Toast.makeText(MainActivity.this, "Current city details saved", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(MainActivity.this, "City not found", Toast.LENGTH_SHORT).show();
-                }
+
             }
         }catch(NullPointerException e){
             e.printStackTrace();
