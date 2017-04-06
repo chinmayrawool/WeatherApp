@@ -69,8 +69,10 @@ public class MainActivity extends AppCompatActivity {
             if(!(cityKey.equals("") && cityName.equals("") && countryCode.equals(""))){ //&& countryName.equals("")
                 Log.d("demo","if true");
                 LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearMainDisplay);
-                //Current Condition API to get the temperature of the location.
+
                 //Display in the linear layout.
+                //call forecast api
+
             }else{
                 Log.d("demo","else true");
                 LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearMainDisplay);
@@ -145,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
                                             editor.putString("CITY_KEY", cityKey);
                                             editor.apply();
 
+                                            //call forecast api
 
                                         }
 
