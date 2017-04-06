@@ -39,12 +39,14 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/et_MainCity"/>
+            android:id="@+id/et_MainCity"
+            android:hint="City Name (i.e. Charlotte)"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/et_MainCountry"/>
+            android:id="@+id/et_MainCountry"
+            android:hint="Country Name (i.e. US)"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
