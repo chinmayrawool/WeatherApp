@@ -56,9 +56,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_title);
 
-
-
-
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preferences.edit();
         try{
