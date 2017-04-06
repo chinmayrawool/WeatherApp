@@ -56,8 +56,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_title);
 
-        et_city = (EditText) findViewById(R.id.alert_city_name);
-        et_country = (EditText) findViewById(R.id.alert_country_name);
+
 
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -104,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d("demo","Set clicked");
-
+                                et_city = (EditText) findViewById(R.id.alert_city_name);
+                                et_country = (EditText) findViewById(R.id.alert_country_name);
                                 cityName = et_city.getText().toString().trim();
                                 countryCode = et_country.getText().toString().trim();
 
@@ -129,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onResponse(Call call, Response response) throws IOException {
-                                        StringBuilder sb = null;
                                         // Log.d("demo", response.body().string());
                                         String jsonString = response.body().string();
                                         gson = new Gson();
