@@ -23,7 +23,9 @@
         android:layout_height="180dp"
         android:id="@+id/linearMainDisplay"
         android:orientation="vertical"
-        android:padding="2dp">
+        android:padding="2dp"
+        android:gravity="center"
+        android:layout_gravity="center">
 
     </LinearLayout>
 

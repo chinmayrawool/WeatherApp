@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             countryCode = preferences.getString("COUNTRY_CODE", "");
             countryName = preferences.getString("COUNTRY_NAME", "");
             cityKey = preferences.getString("CITY_KEY", "");
-            if(!(cityKey.equals("") && cityName.equals("") && countryCode.equals(""))){ //&& countryName.equals("")
+            if(false/*!(cityKey.equals("") && cityName.equals("") && countryCode.equals(""))*/){ //&& countryName.equals("")
                 Log.d("demo","if true");
                 LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearMainDisplay);
 
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d("demo","Cancel clicked");
+
                             }
                         }).setPositiveButton("Set", new DialogInterface.OnClickListener() {
                             @Override
