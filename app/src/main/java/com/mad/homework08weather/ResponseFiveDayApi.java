@@ -127,6 +127,21 @@ public class ResponseFiveDayApi {
         public void setLink(String Link) {
             this.Link = Link;
         }
+
+        @Override
+        public String toString() {
+            return "HeadlineBean{" +
+                    "EffectiveDate='" + EffectiveDate + '\'' +
+                    ", EffectiveEpochDate=" + EffectiveEpochDate +
+                    ", Severity=" + Severity +
+                    ", Text='" + Text + '\'' +
+                    ", Category='" + Category + '\'' +
+                    ", EndDate='" + EndDate + '\'' +
+                    ", EndEpochDate=" + EndEpochDate +
+                    ", MobileLink='" + MobileLink + '\'' +
+                    ", Link='" + Link + '\'' +
+                    '}';
+        }
     }
 
     public static class DailyForecastsBean {
@@ -363,5 +378,27 @@ public class ResponseFiveDayApi {
                 this.IconPhrase = IconPhrase;
             }
         }
+
+        @Override
+        public String toString() {
+            return "DailyForecastsBean{" +
+                    "Date='" + Date + '\'' +
+                    ", EpochDate=" + EpochDate +
+                    ", Temperature=" + Temperature +
+                    ", Day=" + Day +
+                    ", Night=" + Night +
+                    ", MobileLink='" + MobileLink + '\'' +
+                    ", Link='" + Link + '\'' +
+                    ", Sources=" + Sources +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseFiveDayApi{" +
+                "Headline=" + Headline +
+                ", DailyForecasts=" + DailyForecasts +
+                '}';
     }
 }

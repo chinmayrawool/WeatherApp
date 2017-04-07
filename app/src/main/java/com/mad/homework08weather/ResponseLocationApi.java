@@ -322,7 +322,7 @@ public class ResponseLocationApi {
 
         private String Code;
         private String Name;
-        private int GmtOffset;
+        private float GmtOffset;
         private boolean IsDaylightSaving;
         private String NextOffsetChange;
 
@@ -342,11 +342,11 @@ public class ResponseLocationApi {
             this.Name = Name;
         }
 
-        public int getGmtOffset() {
+        public float getGmtOffset() {
             return GmtOffset;
         }
 
-        public void setGmtOffset(int GmtOffset) {
+        public void setGmtOffset(float GmtOffset) {
             this.GmtOffset = GmtOffset;
         }
 
@@ -535,5 +535,26 @@ public class ResponseLocationApi {
         public void setEnglishName(String EnglishName) {
             this.EnglishName = EnglishName;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseLocationApi{" +
+                "Version=" + Version +
+                ", Key='" + Key + '\'' +
+                ", Type='" + Type + '\'' +
+                ", Rank=" + Rank +
+                ", LocalizedName='" + LocalizedName + '\'' +
+                ", EnglishName='" + EnglishName + '\'' +
+                ", PrimaryPostalCode='" + PrimaryPostalCode + '\'' +
+                ", Region=" + Region +
+                ", Country=" + Country +
+                ", AdministrativeArea=" + AdministrativeArea +
+                ", TimeZone=" + TimeZone +
+                ", GeoPosition=" + GeoPosition +
+                ", IsAlias=" + IsAlias +
+                ", SupplementalAdminAreas=" + SupplementalAdminAreas +
+                ", DataSets=" + DataSets +
+                '}';
     }
 }

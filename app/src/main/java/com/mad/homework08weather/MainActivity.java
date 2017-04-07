@@ -47,7 +47,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     String cityName,countryCode,cityKey,countryName;
-    boolean tempUnit = false,flag = false; //false=Celsius, true= fahrenheit
+    boolean tempUnit = false; //false=Celsius, true= fahrenheit
     Location location;
     SharedPreferences.Editor editor;
     SharedPreferences preferences;
@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     int currentCityWeatherIcon;
     LinearLayout linearLayout;
     OkHttpClient client;
+    ProgressDialog pg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preferences.edit();
         linearLayout = (LinearLayout) findViewById(R.id.linearMainDisplay);
+        pg = new ProgressDialog(MainActivity.this);
+        client = new OkHttpClient();
         try{
             cityName = preferences.getString("CITY_NAME", "");
             countryCode = preferences.getString("COUNTRY_CODE", "");
@@ -103,8 +106,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         final View view = getLayoutInflater().inflate(R.layout.alert_set_city,null);
-
-
                         builder.setTitle("Enter city details")
                         .setView(view)
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -124,14 +125,16 @@ public class MainActivity extends AppCompatActivity {
                                 cityName = et_city.getText().toString().trim();
                                 countryCode = et_country.getText().toString().trim();
 
-                                ProgressDialog pg = new ProgressDialog(MainActivity.this);
-                                pg.setCancelable(false);
-                                pg.show();
-                                //Okhhtp client call and gson parsing for retrieving key
-                                client = new OkHttpClient();
+
+                                //Okhttp client call and gson parsing for retrieving key
+                                //client = new OkHttpClient();
                                 Request request = new Request.Builder()
                                         .url("http://dataservice.accuweather.com/locations/v1/"+countryCode.trim()+"/search?apikey="+apiKey.trim()+"&q="+cityName.trim())
                                         .build();
+
+                                pg.setCancelable(false);
+                                pg.show();
+
 
                                 client.newCall(request).enqueue(new Callback() {
                                     @Override
@@ -162,18 +165,18 @@ public class MainActivity extends AppCompatActivity {
 
 
                                         }
-
+                                        if(cityKey!=null || !(cityKey.equals(""))){
+                                            //Toast.makeText(MainActivity.this, "Current city details saved", Toast.LENGTH_SHORT).show();
+                                            //cityKey, apiKEy
+                                            displayCurrentWeather();
+                                        }else{
+                                            Toast.makeText(MainActivity.this, "City not found", Toast.LENGTH_SHORT).show();
+                                        }
+                                        pg.dismiss();
                                     }
                                 });
 
-                                pg.dismiss();
-                                if(cityKey!=null || !(cityKey.equals(""))){
-                                    Toast.makeText(MainActivity.this, "Current city details saved", Toast.LENGTH_SHORT).show();
-                                    //cityKey, apiKEy
-                                    displayCurrentWeather();
-                                }else{
-                                    Toast.makeText(MainActivity.this, "City not found", Toast.LENGTH_SHORT).show();
-                                }
+
 
                         }
                                            });
@@ -194,19 +197,20 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("CITY_KEY",cityKey);
         editor.apply();*/
 
-
         findViewById(R.id.btn_MainSearchCity).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EditText editTextCity = (EditText) findViewById(R.id.et_MainCity);
                 EditText editTextCountry = (EditText) findViewById(R.id.et_MainCountry);
                 cityName = editTextCity.getText().toString().trim();
-                countryName = editTextCountry.getText().toString().trim();
+                countryCode = editTextCountry.getText().toString().trim();
                 //API CALL for
+                Intent intent = new Intent(getApplicationContext(),ForecastActivity.class);
+                intent.putExtra("CITY_NAME",cityName);
+                intent.putExtra("COUNTRY_CODE",countryCode);
+                startActivity(intent);
             }
         });
-
-
 
 
     }
@@ -223,7 +227,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.settings) {
             Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
-
+            Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+            startActivity(intent);
             // Intent to Preference Activity.
         }
 
@@ -244,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
     void displayCurrentWeather(){
 
 
-        client = new OkHttpClient();
+        //client = new OkHttpClient();
         Request request1 = new Request.Builder()
                 .url("http://dataservice.accuweather.com/currentconditions/v1/"+cityKey.trim()+"?apikey="+apiKey.trim())
                 .build();
@@ -266,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("demo","json API2 Current="+jsonString);
                 gson = new Gson();
                 ResponseCurrentForecastApi[] currentForecast =gson.fromJson(jsonString,ResponseCurrentForecastApi[].class);
-                Log.d("demo","curren forecast="+currentForecast[0].toString());
+                Log.d("demo","current forecast="+currentForecast[0].toString());
                 currentCityWeatherText = currentForecast[0].getWeatherText();
                 currentCityTempCel = currentForecast[0].getTemperature().getMetric().getValue();
                 currentCityTempF = currentForecast[0].getTemperature().getImperial().getValue();
