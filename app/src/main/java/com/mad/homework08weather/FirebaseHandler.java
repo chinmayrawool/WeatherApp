@@ -6,6 +6,8 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -24,16 +26,40 @@ public class FirebaseHandler {
         this.mActivity = mActivity;
     }
 
-    boolean saveCity(CityDetails city){
+    FirebaseHandler(DatabaseReference db){
+        this.db = db;
 
+    }
+
+    boolean saveCity(CityDetails city){
+        saved =false;
 
         if(city == null){
             saved = false;
         }else{
             db.child("City").child(city.getCityKey()).setValue(city);
-        }
 
+        }
+        Log.d("demo","saved ="+saved);
         return saved;
+    }
+
+    void removeCity(CityDetails city){
+
+        Query cityKeyQuery = db.child("City").orderByChild("cityKey").equalTo(city.getCityKey());
+        cityKeyQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    ds.getRef().removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public ArrayList<CityDetails> retrieveCities(){
@@ -42,6 +68,7 @@ public class FirebaseHandler {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 saved = true;
                 cities = getData(dataSnapshot);
+                Log.d("demo","onchildadded"+db.toString()+saved);
 
             }
 
@@ -49,11 +76,13 @@ public class FirebaseHandler {
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 saved = false;
                 cities = getData(dataSnapshot);
+                Log.d("demo","onchildchanged"+saved);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                cities = getData(dataSnapshot);
+                Log.d("demo","onChildRemoved");
             }
 
             @Override
@@ -66,7 +95,9 @@ public class FirebaseHandler {
 
             }
         });
-        Log.d("demo","cities in retrieve details "+cities.toString());
+
+        //db.child("City").child("favorite").orderByValue().equalTo(true);
+        Log.d("demo","cities in retrieve details "+cities.toString()+db.toString());
         Log.d("demo","Before return of cities");
 
         return cities;

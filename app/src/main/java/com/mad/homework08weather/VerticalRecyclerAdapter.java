@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -27,12 +29,15 @@ public class VerticalRecyclerAdapter extends RecyclerView.Adapter<VerticalRecycl
     private List<CityDetails> mData;
     // Store the context for easy access
     private Context mContext;
+    FirebaseHandler handler;
+    DatabaseReference db;
 
 
     public VerticalRecyclerAdapter(Context mContext, List<CityDetails> mData ) {
         this.mData = mData;
         this.mContext = mContext;
-
+        db = FirebaseDatabase.getInstance().getReference();
+        handler = new FirebaseHandler(db);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
@@ -65,16 +70,49 @@ public class VerticalRecyclerAdapter extends RecyclerView.Adapter<VerticalRecycl
 
     @Override
     public void onBindViewHolder(final VerticalRecyclerAdapter.ViewHolder holder, final int position) {
-        CityDetails city = mData.get(position);
+        final CityDetails city = mData.get(position);
 
 
         holder.textViewCityCountry.setText(city.getCityName()+", "+city.getCountryCode());
         if(MainActivity.tempUnit) { // true = F
-            //holder.textViewTemp.setText("Temperature : " + city.getTempCel()+"°F");
-        }else{
+            double tempinF = (Float.parseFloat(city.getTempCel())*1.8)+32;
+            holder.textViewTemp.setText("Temperature : " + tempinF+"°F");
+        }else{ //false = C
             holder.textViewTemp.setText("Temperature : " + city.getTempCel()+"°C");
         }
         holder.textViewUpdatedTime.setText("Last Updated : "+ city.getLastUpdated());
+
+        if(city.isFavorite()){
+            holder.imageViewFavorite.setImageResource(R.drawable.star_gold);
+        }else{
+            holder.imageViewFavorite.setImageResource(R.drawable.star_gray);
+        }
+
+        holder.imageViewFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(city.isFavorite()){
+                    Log.d("demo","Clicked favorite= true");
+                    city.setFavorite(false);
+                    handler.saveCity(city);
+                    holder.imageViewFavorite.setImageResource(R.drawable.star_gray);
+                }else{
+                    Log.d("demo","Clicked favorite= true");
+                    city.setFavorite(true);
+                    handler.saveCity(city);
+                    holder.imageViewFavorite.setImageResource(R.drawable.star_gold);
+                }
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(mContext, "Long clicked", Toast.LENGTH_SHORT).show();
+                handler.removeCity(city);
+                return true;
+            }
+        });
 
     }
 
@@ -82,4 +120,5 @@ public class VerticalRecyclerAdapter extends RecyclerView.Adapter<VerticalRecycl
     public int getItemCount() {
         return mData.size();
     }
+
 }

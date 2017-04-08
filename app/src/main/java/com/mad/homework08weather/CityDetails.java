@@ -1,5 +1,7 @@
 package com.mad.homework08weather;
 
+import java.util.Comparator;
+
 /**
  * Created by neha5 on 07-04-2017.
  */
@@ -82,4 +84,13 @@ public class CityDetails {
                 ", favorite=" + favorite +
                 '}';
     }
+
+    public static Comparator<CityDetails> favComparator = new Comparator<CityDetails>() {
+        @Override
+        public int compare(CityDetails o1, CityDetails o2) {
+            Boolean b1 = o1.isFavorite();
+            Boolean b2 = o2.isFavorite();
+            return -1 * b1.compareTo(b2);
+        }
+    };
 }

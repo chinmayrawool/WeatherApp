@@ -165,9 +165,25 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             handler = new FirebaseHandler(dbRoot,ForecastActivity.this);
 
             //fetch city details and save them in firebase database
-
+            Log.d("demo","retrieving details onoptionsselected");
             cities = handler.retrieveCities();
+            Log.d("demo","saved cities"+cities.toString());
 
+           /* if(cities.size()==0){
+                CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
+                Log.d("demo","calling save city onoptionsitemselected");
+                boolean saved = handler.saveCity(city);
+
+                if(found && !saved){
+                    Log.d("demo", "if found true");
+                    Toast.makeText(this, "City updated", Toast.LENGTH_SHORT).show();
+                }else if(saved){
+                    Log.d("demo","if saved true");
+                    Toast.makeText(this, "City saved", Toast.LENGTH_SHORT).show();
+                }else if(!saved){
+                    Toast.makeText(this, "Saving error", Toast.LENGTH_SHORT).show();
+                }
+            }*/
 
 
 
@@ -307,6 +323,8 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
                 startActivity(intent);
             }
         });
+
+        tempCel = String.valueOf((list.get(0).getTemperature().getMinimum().getValue()-32)*9/5);
     }
 
     private String generateUrl(int icon){
@@ -324,7 +342,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     @Override
     public void getCitiesDetails(ArrayList<CityDetails> cities) {
         this.cities = cities;
-
+        Log.d("demo","in getCitydetails");
 
         for(CityDetails city1: cities){
             Log.d("demo","city :"+city1.toString());
@@ -337,7 +355,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
         }
 
         CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
-        Log.d("demo","calling save city");
+        Log.d("demo","calling save city in getCitydetails");
         boolean saved = handler.saveCity(city);
 
         if(found && !saved){

@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
@@ -376,12 +377,15 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
         this.cities = cities;
         Log.d("demo","Cities:"+cities.toString());
 
+        Collections.sort(cities,CityDetails.favComparator);
 
         rvSavedCities = new RecyclerView(MainActivity.this);
+        rvSavedCities.setLongClickable(true);
         VerticalRecyclerAdapter adapter = new VerticalRecyclerAdapter(MainActivity.this,cities);
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
         rvSavedCities.setLayoutManager(layoutManager);
+        adapter.notifyDataSetChanged();
         rvSavedCities.setAdapter(adapter);
         linearSavedCity.removeAllViews();
         linearSavedCity.addView(rvSavedCities);
