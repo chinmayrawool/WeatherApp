@@ -76,7 +76,6 @@ public class VerticalRecyclerAdapter extends RecyclerView.Adapter<VerticalRecycl
         }
         holder.textViewUpdatedTime.setText("Last Updated : "+ city.getLastUpdated());
 
-
     }
 
     @Override

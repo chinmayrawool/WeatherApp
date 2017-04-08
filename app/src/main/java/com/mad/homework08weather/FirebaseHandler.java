@@ -1,5 +1,7 @@
 package com.mad.homework08weather;
 
+import android.util.Log;
+
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,7 +27,7 @@ public class FirebaseHandler {
         if(city == null){
             saved = false;
         }else{
-            db.child("City").child(city.getCityKey()).setValue(city);
+            db.child("City").push().setValue(city);
             saved = true;
         }
 
@@ -36,13 +38,13 @@ public class FirebaseHandler {
         db.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                getData(dataSnapshot);
+                cities = getData(dataSnapshot);
 
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                getData(dataSnapshot);
+                cities = getData(dataSnapshot);
             }
 
             @Override
@@ -60,16 +62,22 @@ public class FirebaseHandler {
 
             }
         });
-
+        Log.d("demo","cities in retrieve details "+cities.toString());
+        Log.d("demo","Before return of cities");
         return cities;
     }
 
-    private void getData(DataSnapshot dataSnapshot){
-        cities.clear();
+    private ArrayList<CityDetails> getData(DataSnapshot dataSnapshot){
+        cities = new ArrayList<>();
 
         for (DataSnapshot ds: dataSnapshot.getChildren()) {
-            CityDetails city = ds.getValue(CityDetails.class);
+
+            CityDetails city = new CityDetails(ds.getValue(CityDetails.class).getCityKey(),ds.getValue(CityDetails.class).getCityName(),ds.getValue(CityDetails.class).getCountryCode(),ds.getValue(CityDetails.class).getTempCel(),ds.getValue(CityDetails.class).getLastUpdated(),ds.getValue(CityDetails.class).isFavorite());
+            Log.d("demo","In Handler, City:"+city.toString());
             cities.add(city);
+            Log.d("demo","Cities size="+cities.size());
         }
+
+        return cities;
     }
 }

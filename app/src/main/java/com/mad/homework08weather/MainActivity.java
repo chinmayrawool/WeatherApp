@@ -4,15 +4,14 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,11 +21,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -36,9 +35,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import okhttp3.Call;
@@ -62,13 +59,16 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout linearLayout;
     OkHttpClient client;
     ProgressDialog pg;
-    ArrayList<CityDetails> cities=null;
+    ArrayList<CityDetails> cities= new ArrayList<>();;
     RecyclerView rvSavedCities;
     FirebaseHandler handler;
+    LinearLayout linearSavedCity;
+    DatabaseReference rbRoot;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("demo","onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -80,7 +80,32 @@ public class MainActivity extends AppCompatActivity {
         editor = preferences.edit();
         linearLayout = (LinearLayout) findViewById(R.id.linearMainDisplay);
         pg = new ProgressDialog(MainActivity.this);
-        LinearLayout linearSavedCity = (LinearLayout) findViewById(R.id.linearSavedCity);
+        linearSavedCity = (LinearLayout) findViewById(R.id.linearSavedCity);
+        cities = new ArrayList<>();
+        rbRoot = FirebaseDatabase.getInstance().getReference();
+        handler = new FirebaseHandler(rbRoot);
+
+        cities = handler.retrieveCities();
+        Log.d("demo","Cities in main: "+cities.toString());
+        if(cities.size()==0) {
+            Log.d("demo","cities is null");
+            linearSavedCity.removeAllViews();
+            TextView textViewSavedCities = new TextView(this);
+            textViewSavedCities.setText("There are no cities to display.\nSearch the city from the search box and save.");
+            textViewSavedCities.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            linearSavedCity.addView(textViewSavedCities);
+
+        }else{
+            Log.d("demo","cities is not null");
+            rvSavedCities = new RecyclerView(this);
+            VerticalRecyclerAdapter adapter = new VerticalRecyclerAdapter(MainActivity.this,cities);
+            LinearLayoutManager layoutManager
+                    = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            rvSavedCities.setLayoutManager(layoutManager);
+            rvSavedCities.setAdapter(adapter);
+            linearSavedCity.removeAllViews();
+            linearSavedCity.addView(rvSavedCities);
+        }
 
         client = new OkHttpClient();
         try{
@@ -197,28 +222,11 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            cities = handler.retrieveCities();
-            if(cities==null) {
-                linearSavedCity.removeAllViews();
-                TextView textViewSavedCities = new TextView(this);
-                textViewSavedCities.setText("There are no cities to display.\nSearch the city from the search box and save.");
-                textViewSavedCities.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                linearSavedCity.addView(textViewSavedCities);
 
-            }else{
-
-                rvSavedCities = new RecyclerView(this);
-                VerticalRecyclerAdapter adapter = new VerticalRecyclerAdapter(MainActivity.this,cities);
-                LinearLayoutManager layoutManager
-                        = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-                rvSavedCities.setLayoutManager(layoutManager);
-                rvSavedCities.setAdapter(adapter);
-                linearSavedCity.removeAllViews();
-                linearSavedCity.addView(rvSavedCities);
-            }
         }catch(NullPointerException e){
             e.printStackTrace();
         }
+
 
         //Use this in Search button
         /*editor.putString("CITY_NAME",cityName);
@@ -355,4 +363,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }
