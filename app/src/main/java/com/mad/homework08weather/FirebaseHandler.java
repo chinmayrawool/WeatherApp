@@ -16,19 +16,21 @@ import java.util.ArrayList;
 public class FirebaseHandler {
     DatabaseReference db;
     ArrayList<CityDetails> cities = new ArrayList<CityDetails>();
+    ICities mActivity;
+    boolean saved = false;
 
-    FirebaseHandler(DatabaseReference db){
+    FirebaseHandler(DatabaseReference db, ICities mActivity){
         this.db = db;
+        this.mActivity = mActivity;
     }
 
     boolean saveCity(CityDetails city){
-        boolean saved = false;
+
 
         if(city == null){
             saved = false;
         }else{
-            db.child("City").push().setValue(city);
-            saved = true;
+            db.child("City").child(city.getCityKey()).setValue(city);
         }
 
         return saved;
@@ -38,12 +40,14 @@ public class FirebaseHandler {
         db.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                saved = true;
                 cities = getData(dataSnapshot);
 
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                saved = false;
                 cities = getData(dataSnapshot);
             }
 
@@ -64,6 +68,7 @@ public class FirebaseHandler {
         });
         Log.d("demo","cities in retrieve details "+cities.toString());
         Log.d("demo","Before return of cities");
+
         return cities;
     }
 
@@ -77,7 +82,12 @@ public class FirebaseHandler {
             cities.add(city);
             Log.d("demo","Cities size="+cities.size());
         }
-
+        mActivity.getCitiesDetails(cities);
         return cities;
+    }
+
+
+    public interface ICities{
+        public void getCitiesDetails(ArrayList<CityDetails> cities);
     }
 }

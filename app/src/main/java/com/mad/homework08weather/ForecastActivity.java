@@ -46,7 +46,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ForecastActivity extends AppCompatActivity implements RecyclerAdapter.Idata{
+public class ForecastActivity extends AppCompatActivity implements RecyclerAdapter.Idata,FirebaseHandler.ICities{
 
     RecyclerAdapter adapter;
     OkHttpClient client;
@@ -62,6 +62,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     FirebaseHandler handler;
     ArrayList<CityDetails> cities;
     boolean favorite = false;
+    boolean found = false;
 
 
     @Override
@@ -155,34 +156,19 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean found = false;
+
         if(item.getItemId()==R.id.saveCity) {
             Toast.makeText(this, "Save City clicked", Toast.LENGTH_SHORT).show();
 
             //Add city details to Firebase database
             dbRoot = FirebaseDatabase.getInstance().getReference();
-            handler = new FirebaseHandler(dbRoot);
+            handler = new FirebaseHandler(dbRoot,ForecastActivity.this);
 
             //fetch city details and save them in firebase database
 
             cities = handler.retrieveCities();
 
-            for(CityDetails city1: cities){
-                if(city1.getCityKey().equals(cityKey)){
-                    favorite = city1.isFavorite();
-                    found = true;
-                }
-            }
 
-            CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
-            boolean saved = handler.saveCity(city);
-            if(saved){
-                Toast.makeText(this, "City saved", Toast.LENGTH_SHORT).show();
-            }else if(found){
-                Toast.makeText(this, "City updated", Toast.LENGTH_SHORT).show();
-            }else if(!saved){
-                Toast.makeText(this, "Saving error", Toast.LENGTH_SHORT).show();
-            }
 
 
 
@@ -335,4 +321,33 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     }
 
 
+    @Override
+    public void getCitiesDetails(ArrayList<CityDetails> cities) {
+        this.cities = cities;
+
+
+        for(CityDetails city1: cities){
+            Log.d("demo","city :"+city1.toString());
+            if(city1.getCityKey().equals(cityKey)){
+                Log.d("demo","found"+cityKey+" "+city1.getCityKey());
+
+                favorite = city1.isFavorite();
+                found = true;
+            }
+        }
+
+        CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
+        Log.d("demo","calling save city");
+        boolean saved = handler.saveCity(city);
+
+        if(found && !saved){
+            Log.d("demo", "if found true");
+            Toast.makeText(this, "City updated", Toast.LENGTH_SHORT).show();
+        }else if(saved){
+            Log.d("demo","if saved true");
+            Toast.makeText(this, "City saved", Toast.LENGTH_SHORT).show();
+        }else if(!saved){
+            Toast.makeText(this, "Saving error", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

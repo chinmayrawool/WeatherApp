@@ -44,7 +44,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FirebaseHandler.ICities {
     String cityName,countryCode,cityKey,countryName;
     static boolean tempUnit = false; //false=Celsius, true= fahrenheit
     Location location;
@@ -83,29 +83,12 @@ public class MainActivity extends AppCompatActivity {
         linearSavedCity = (LinearLayout) findViewById(R.id.linearSavedCity);
         cities = new ArrayList<>();
         rbRoot = FirebaseDatabase.getInstance().getReference();
-        handler = new FirebaseHandler(rbRoot);
+        handler = new FirebaseHandler(rbRoot,this);
 
         cities = handler.retrieveCities();
-        Log.d("demo","Cities in main: "+cities.toString());
-        if(cities.size()==0) {
-            Log.d("demo","cities is null");
-            linearSavedCity.removeAllViews();
-            TextView textViewSavedCities = new TextView(this);
-            textViewSavedCities.setText("There are no cities to display.\nSearch the city from the search box and save.");
-            textViewSavedCities.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            linearSavedCity.addView(textViewSavedCities);
 
-        }else{
-            Log.d("demo","cities is not null");
-            rvSavedCities = new RecyclerView(this);
-            VerticalRecyclerAdapter adapter = new VerticalRecyclerAdapter(MainActivity.this,cities);
-            LinearLayoutManager layoutManager
-                    = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-            rvSavedCities.setLayoutManager(layoutManager);
-            rvSavedCities.setAdapter(adapter);
-            linearSavedCity.removeAllViews();
-            linearSavedCity.addView(rvSavedCities);
-        }
+        Log.d("demo","Cities in main: "+cities.toString());
+
 
         client = new OkHttpClient();
         try{
@@ -220,6 +203,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+
+
+
+
             }
 
 
@@ -233,6 +220,8 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("COUNTRY_CODE",countryCode);
         editor.putString("CITY_KEY",cityKey);
         editor.apply();*/
+
+
 
         findViewById(R.id.btn_MainSearchCity).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,7 +238,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        if(cities.size()==0) {
+            Log.d("demo","cities is null");
+            linearSavedCity.removeAllViews();
+            TextView textViewSavedCities = new TextView(MainActivity.this);
+            textViewSavedCities.setText("There are no cities to display.\nSearch the city from the search box and save.");
+            textViewSavedCities.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            linearSavedCity.addView(textViewSavedCities);
 
+        }else{
+            Log.d("demo","cities is not null");
+            /*rvSavedCities = new RecyclerView(MainActivity.this);
+            VerticalRecyclerAdapter adapter = new VerticalRecyclerAdapter(MainActivity.this,cities);
+            LinearLayoutManager layoutManager
+                    = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
+            rvSavedCities.setLayoutManager(layoutManager);
+            rvSavedCities.setAdapter(adapter);
+            linearSavedCity.removeAllViews();
+            linearSavedCity.addView(rvSavedCities);*/
+        }
     }
 
     @Override
@@ -364,4 +371,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void getCitiesDetails(ArrayList<CityDetails> cities) {
+        this.cities = cities;
+        Log.d("demo","Cities:"+cities.toString());
+
+
+        rvSavedCities = new RecyclerView(MainActivity.this);
+        VerticalRecyclerAdapter adapter = new VerticalRecyclerAdapter(MainActivity.this,cities);
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
+        rvSavedCities.setLayoutManager(layoutManager);
+        rvSavedCities.setAdapter(adapter);
+        linearSavedCity.removeAllViews();
+        linearSavedCity.addView(rvSavedCities);
+    }
 }
