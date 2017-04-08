@@ -8,6 +8,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,7 +49,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     String cityName,countryCode,cityKey,countryName;
-    boolean tempUnit = false; //false=Celsius, true= fahrenheit
+    static boolean tempUnit = false; //false=Celsius, true= fahrenheit
     Location location;
     SharedPreferences.Editor editor;
     SharedPreferences preferences;
@@ -60,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout linearLayout;
     OkHttpClient client;
     ProgressDialog pg;
+    ArrayList<CityDetails> cities=null;
+    RecyclerView rvSavedCities;
+    FirebaseHandler handler;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
         editor = preferences.edit();
         linearLayout = (LinearLayout) findViewById(R.id.linearMainDisplay);
         pg = new ProgressDialog(MainActivity.this);
+        LinearLayout linearSavedCity = (LinearLayout) findViewById(R.id.linearSavedCity);
+
         client = new OkHttpClient();
         try{
             cityName = preferences.getString("CITY_NAME", "");
@@ -186,6 +195,26 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+            }
+
+            cities = handler.retrieveCities();
+            if(cities==null) {
+                linearSavedCity.removeAllViews();
+                TextView textViewSavedCities = new TextView(this);
+                textViewSavedCities.setText("There are no cities to display.\nSearch the city from the search box and save.");
+                textViewSavedCities.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                linearSavedCity.addView(textViewSavedCities);
+
+            }else{
+
+                rvSavedCities = new RecyclerView(this);
+                VerticalRecyclerAdapter adapter = new VerticalRecyclerAdapter(MainActivity.this,cities);
+                LinearLayoutManager layoutManager
+                        = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                rvSavedCities.setLayoutManager(layoutManager);
+                rvSavedCities.setAdapter(adapter);
+                linearSavedCity.removeAllViews();
+                linearSavedCity.addView(rvSavedCities);
             }
         }catch(NullPointerException e){
             e.printStackTrace();

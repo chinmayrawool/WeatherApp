@@ -18,9 +18,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -41,16 +47,23 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class ForecastActivity extends AppCompatActivity implements RecyclerAdapter.Idata{
-    RecyclerView recyclerView;
+
     RecyclerAdapter adapter;
     OkHttpClient client;
     String apiKey = "naqiA2sdihu1iBA6uYB4GYXHBCAvpDRO";
     ProgressDialog pg;
-    String cityName,countryCode,cityKey;
+    String cityName,countryCode,cityKey,tempCel, lastUpdated;
     SharedPreferences.Editor editor;
     SharedPreferences preferences;
     ArrayList<ResponseFiveDayApi.DailyForecastsBean> list = new ArrayList<ResponseFiveDayApi.DailyForecastsBean>();
     int position =0;
+    DatabaseReference dbRoot;
+    RecyclerView recyclerView, rvSavedCities;
+    FirebaseHandler handler;
+    ArrayList<CityDetails> cities;
+    boolean favorite = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -142,10 +155,37 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean found = false;
         if(item.getItemId()==R.id.saveCity) {
             Toast.makeText(this, "Save City clicked", Toast.LENGTH_SHORT).show();
 
             //Add city details to Firebase database
+            dbRoot = FirebaseDatabase.getInstance().getReference();
+            handler = new FirebaseHandler(dbRoot);
+
+            //fetch city details and save them in firebase database
+
+            cities = handler.retrieveCities();
+
+            for(CityDetails city1: cities){
+                if(city1.getCityKey().equals(cityKey)){
+                    favorite = city1.isFavorite();
+                    found = true;
+                }
+            }
+
+            CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
+            boolean saved = handler.saveCity(city);
+            if(saved){
+                Toast.makeText(this, "City saved", Toast.LENGTH_SHORT).show();
+            }else if(found){
+                Toast.makeText(this, "City updated", Toast.LENGTH_SHORT).show();
+            }else if(!saved){
+                Toast.makeText(this, "Saving error", Toast.LENGTH_SHORT).show();
+            }
+
+
+
         }
         if(item.getItemId()==R.id.setCurrentCity) {
             Toast.makeText(this, "Set as Current City clicked", Toast.LENGTH_SHORT).show();
@@ -186,11 +226,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
                 Gson gson = new Gson();
                 final ResponseFiveDayApi responseFiveDayForecast =gson.fromJson(jsonString,ResponseFiveDayApi.class);
                 Log.d("demo","current forecast="+responseFiveDayForecast.toString());
-                /*currentCityWeatherText = currentForecast[0].getWeatherText();
-                currentCityTempCel = currentForecast[0].getTemperature().getMetric().getValue();
-                currentCityTempF = currentForecast[0].getTemperature().getImperial().getValue();
-                currentCityWeatherIcon = currentForecast[0].getWeatherIcon();
-                currentCityUpdatedTime = currentForecast[0].getLocalObservationDateTime();*/
+
 
                 ForecastActivity.this.runOnUiThread(new Runnable() {
                     @Override
@@ -233,6 +269,9 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     public void display(final int position){
         Toast.makeText(ForecastActivity.this, "pos="+position, Toast.LENGTH_SHORT).show();
 
+        //tempCel, lastUpdated
+
+
         //textViewDateLabel, textViewTemperature, imageViewDay, textViewForecastDay, imageViewNight, textViewForecastNight
         TextView textViewDateLabel = (TextView) findViewById(R.id.textViewDateLabel);
         //2017-04-06T18:03:00-04:00
@@ -242,6 +281,10 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             String ReDate = list.get(position).getDate().substring(0, 10);
             Log.d("demo", "format:" + ReDate);
             date = formatter.parse(ReDate);
+
+            String timeFormat = new PrettyTime(new Locale("")).format(date);
+            lastUpdated = timeFormat;
+
             DateFormat format1 = new SimpleDateFormat("MMMM dd, yyyy");
             String dateString = format1.format(date);
             Log.d("demo", "Updated:" + list.get(position).getDate() + "    Date:" + date);
