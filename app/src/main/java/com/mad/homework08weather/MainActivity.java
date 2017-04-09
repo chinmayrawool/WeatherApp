@@ -389,5 +389,6 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
         rvSavedCities.setAdapter(adapter);
         linearSavedCity.removeAllViews();
         linearSavedCity.addView(rvSavedCities);
+
     }
 }

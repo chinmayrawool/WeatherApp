@@ -169,7 +169,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             cities = handler.retrieveCities();
             Log.d("demo","saved cities"+cities.toString());
 
-            /*if(cities.size()==0){
+            if(cities.size()==0){
                 CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
                 Log.d("demo","calling save city onoptionsitemselected");
                 boolean saved = handler.saveCity(city);
@@ -183,7 +183,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
                 }else if(!saved){
                     Toast.makeText(this, "Saving error", Toast.LENGTH_SHORT).show();
                 }
-            }*/
+            }
 
 
 

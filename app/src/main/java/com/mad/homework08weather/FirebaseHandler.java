@@ -88,8 +88,9 @@ public class FirebaseHandler {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                cities = getData(dataSnapshot);
                 Log.d("demo","onChildRemoved");
+                cities = removeData(dataSnapshot);
+
             }
 
             @Override
@@ -118,6 +119,19 @@ public class FirebaseHandler {
             CityDetails city = new CityDetails(ds.getValue(CityDetails.class).getCityKey(),ds.getValue(CityDetails.class).getCityName(),ds.getValue(CityDetails.class).getCountryCode(),ds.getValue(CityDetails.class).getTempCel(),ds.getValue(CityDetails.class).getLastUpdated(),ds.getValue(CityDetails.class).isFavorite());
             Log.d("demo","In Handler, City:"+city.toString());
             cities.add(city);
+        }
+        mActivity.getCitiesDetails(cities);
+        return cities;
+    }
+
+    private ArrayList<CityDetails> removeData(DataSnapshot dataSnapshot){
+        cities = new ArrayList<>();
+
+        for (DataSnapshot ds: dataSnapshot.getChildren()) {
+
+            CityDetails city = new CityDetails(ds.getValue(CityDetails.class).getCityKey(),ds.getValue(CityDetails.class).getCityName(),ds.getValue(CityDetails.class).getCountryCode(),ds.getValue(CityDetails.class).getTempCel(),ds.getValue(CityDetails.class).getLastUpdated(),ds.getValue(CityDetails.class).isFavorite());
+            Log.d("demo","In Handler, City:"+city.toString());
+            cities.remove(city);
         }
         mActivity.getCitiesDetails(cities);
         return cities;
