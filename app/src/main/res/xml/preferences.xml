@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <MultiSelectListPreference
+        android:title="Temperature Unit"
+        android:defaultValue="C"
+        android:entries="@array/temp_units"
+        android:entryValues="@array/temp_values"
+        android:key="pref_temp_unit"
+        android:summary="Choose between Celcius and Fahrenheit"
+        android:dialogTitle="Choose Temperature Unit"/>
+    <EditTextPreference
+        android:defaultValue="Default value"
+        android:selectAllOnFocus="true"
+        android:title="Current City"
+        android:key="pref_current_city"
+        android:summary="Change Current City"
+        android:singleLine="true"
+        android:dialogTitle="Enter city details" />
+
+
+</PreferenceScreen>
