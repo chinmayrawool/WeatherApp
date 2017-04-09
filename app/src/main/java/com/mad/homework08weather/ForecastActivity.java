@@ -64,6 +64,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     ArrayList<CityDetails> cities;
     boolean favorite = false;
     boolean found = false;
+    public static int count =0;
 
 
     @Override
@@ -162,6 +163,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if(item.getItemId()==R.id.saveCity) {
+            //count ++;
             //Toast.makeText(this, "Save City clicked", Toast.LENGTH_SHORT).show();
             Log.d("demo","Save city clicked");
             //Add city details to Firebase database
@@ -172,8 +174,8 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             Log.d("demo","retrieving details onoptionsselected");
             cities = handler.retrieveCities();
             Log.d("demo","saved cities"+cities.toString());
-
-            /*if(cities.size()==0){
+            Log.d("demo","Count ="+ count);
+            if(count == 0){
                 CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
                 Log.d("demo","calling save city onoptionsitemselected");
                 boolean saved = handler.saveCity(city);
@@ -187,7 +189,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
                 }else if(!saved){
                     Toast.makeText(this, "Saving error", Toast.LENGTH_SHORT).show();
                 }
-            }*/
+            }
 
 
 
@@ -356,7 +358,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     public void getCitiesDetails(ArrayList<CityDetails> cities) {
         this.cities = cities;
         Log.d("demo","in getCitydetails");
-
+        count = cities.size();
         for(CityDetails city1: cities){
             Log.d("demo","city :"+city1.toString());
             if(city1.getCityKey().equals(cityKey)){

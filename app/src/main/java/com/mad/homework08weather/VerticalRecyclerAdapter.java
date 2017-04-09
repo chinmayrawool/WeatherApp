@@ -127,6 +127,7 @@ public class VerticalRecyclerAdapter extends RecyclerView.Adapter<VerticalRecycl
             public boolean onLongClick(View v) {
                 Toast.makeText(mContext, "Long clicked", Toast.LENGTH_SHORT).show();
                 handler.removeCity(city);
+                //ForecastActivity.count = ForecastActivity.count-1;
                 return true;
             }
         });

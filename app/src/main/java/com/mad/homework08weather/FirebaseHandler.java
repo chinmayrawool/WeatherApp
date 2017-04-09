@@ -136,6 +136,7 @@ public class FirebaseHandler {
             CityDetails city = new CityDetails(ds.getValue(CityDetails.class).getCityKey(),ds.getValue(CityDetails.class).getCityName(),ds.getValue(CityDetails.class).getCountryCode(),ds.getValue(CityDetails.class).getTempCel(),ds.getValue(CityDetails.class).getLastUpdated(),ds.getValue(CityDetails.class).isFavorite());
             Log.d("demo","In Handler, City:"+city.toString());
             cities.remove(city);
+            ForecastActivity.count =0;
         }
         mActivity.getCitiesDetails(cities);
         return cities;
