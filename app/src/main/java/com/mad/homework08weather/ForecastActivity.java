@@ -158,8 +158,8 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if(item.getItemId()==R.id.saveCity) {
-            Toast.makeText(this, "Save City clicked", Toast.LENGTH_SHORT).show();
-
+            //Toast.makeText(this, "Save City clicked", Toast.LENGTH_SHORT).show();
+            Log.d("demo","Save city clicked");
             //Add city details to Firebase database
             dbRoot = FirebaseDatabase.getInstance().getReference();
             handler = new FirebaseHandler(dbRoot,ForecastActivity.this);
@@ -169,7 +169,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             cities = handler.retrieveCities();
             Log.d("demo","saved cities"+cities.toString());
 
-           /* if(cities.size()==0){
+            /*if(cities.size()==0){
                 CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
                 Log.d("demo","calling save city onoptionsitemselected");
                 boolean saved = handler.saveCity(city);
@@ -324,7 +324,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             }
         });
 
-        tempCel = String.valueOf((list.get(0).getTemperature().getMinimum().getValue()-32)*9/5);
+        tempCel = String.valueOf(Math.round(((list.get(0).getTemperature().getMinimum().getValue()-32)*5/9)*100.0/100.0));
     }
 
     private String generateUrl(int icon){
@@ -358,14 +358,15 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
         Log.d("demo","calling save city in getCitydetails");
         boolean saved = handler.saveCity(city);
 
-        if(found && !saved){
-            Log.d("demo", "if found true");
-            Toast.makeText(this, "City updated", Toast.LENGTH_SHORT).show();
-        }else if(saved){
+        Log.d("demo","found="+found);
+        Log.d("demo","saved="+saved);
+
+        if(saved){
             Log.d("demo","if saved true");
             Toast.makeText(this, "City saved", Toast.LENGTH_SHORT).show();
-        }else if(!saved){
-            Toast.makeText(this, "Saving error", Toast.LENGTH_SHORT).show();
+        }else if(found){
+            Log.d("demo", "if found true");
+            Toast.makeText(this, "City updated", Toast.LENGTH_SHORT).show();
         }
     }
 }

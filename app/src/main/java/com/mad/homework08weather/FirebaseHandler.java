@@ -40,7 +40,7 @@ public class FirebaseHandler {
             db.child("City").child(city.getCityKey()).setValue(city);
 
         }
-        Log.d("demo","saved ="+saved);
+        Log.d("demo","saveCity returned saved ="+saved);
         return saved;
     }
 
@@ -66,17 +66,24 @@ public class FirebaseHandler {
         db.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                saved = true;
+                if(!saved) {
+                    saved = true;
+                }
                 cities = getData(dataSnapshot);
-                Log.d("demo","onchildadded"+db.toString()+saved);
+                Log.d("demo","onchildadded returned"+db.toString()+" "+saved);
 
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                saved = false;
+                if(saved){
+                    saved = true;
+                }else{
+                    saved = false;
+                }
+
                 cities = getData(dataSnapshot);
-                Log.d("demo","onchildchanged"+saved);
+                Log.d("demo","onchildchanged returned"+saved);
             }
 
             @Override
@@ -111,7 +118,6 @@ public class FirebaseHandler {
             CityDetails city = new CityDetails(ds.getValue(CityDetails.class).getCityKey(),ds.getValue(CityDetails.class).getCityName(),ds.getValue(CityDetails.class).getCountryCode(),ds.getValue(CityDetails.class).getTempCel(),ds.getValue(CityDetails.class).getLastUpdated(),ds.getValue(CityDetails.class).isFavorite());
             Log.d("demo","In Handler, City:"+city.toString());
             cities.add(city);
-            Log.d("demo","Cities size="+cities.size());
         }
         mActivity.getCitiesDetails(cities);
         return cities;
