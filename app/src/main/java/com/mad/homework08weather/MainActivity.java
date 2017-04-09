@@ -79,6 +79,13 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preferences.edit();
+        /*preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
+            }
+        });*/
+
         linearLayout = (LinearLayout) findViewById(R.id.linearMainDisplay);
         pg = new ProgressDialog(MainActivity.this);
         linearSavedCity = (LinearLayout) findViewById(R.id.linearSavedCity);
@@ -236,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
                 intent.putExtra("CITY_NAME",cityName);
                 intent.putExtra("COUNTRY_CODE",countryCode);
                 startActivity(intent);
+                //finish();
             }
         });
 
@@ -391,4 +399,6 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
         linearSavedCity.addView(rvSavedCities);
 
     }
+
+
 }

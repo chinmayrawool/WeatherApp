@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.media.Image;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -74,6 +75,8 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_title);
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = preferences.edit();
 
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -85,6 +88,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
 
 
         pg = new ProgressDialog(ForecastActivity.this);
+        pg.setMessage("Loading Data");
         client = new OkHttpClient();
         if(!getIntent().getExtras().getString("CITY_NAME").equals("") && !getIntent().getExtras().getString("COUNTRY_CODE").equals("")){
             cityName = getIntent().getExtras().getString("CITY_NAME");
@@ -192,6 +196,13 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
         if(item.getItemId()==R.id.setCurrentCity) {
             Toast.makeText(this, "Set as Current City clicked", Toast.LENGTH_SHORT).show();
             // Add to Shared preferences
+            editor.putString("CITY_NAME", cityName);
+            editor.putString("COUNTRY_CODE", countryCode);
+            editor.putString("CITY_KEY", cityKey);
+            editor.apply();
+
+            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+            finish();
         }
         if(item.getItemId()==R.id.settingForecast) {
             Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
@@ -251,9 +262,11 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
                                 @Override
                                 public void onClick(View view) {
                                     String link = responseFiveDayForecast.getHeadline().getMobileLink();
+                                    Log.d("demo","Entended Link:"+link);
                                     Intent intent = new Intent(Intent.ACTION_VIEW);
                                     intent.setData(Uri.parse(link));
                                     startActivity(intent);
+
                                 }
                             });
 
@@ -285,7 +298,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             date = formatter.parse(ReDate);
 
             String timeFormat = new PrettyTime(new Locale("")).format(date);
-            lastUpdated = timeFormat;
+            lastUpdated = list.get(0).getDate();
 
             DateFormat format1 = new SimpleDateFormat("MMMM dd, yyyy");
             String dateString = format1.format(date);
@@ -368,5 +381,14 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             Log.d("demo", "if found true");
             Toast.makeText(this, "City updated", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        if(handler!=null) {
+            handler.removeHandler();
+        }
+        super.onDestroy();
     }
 }

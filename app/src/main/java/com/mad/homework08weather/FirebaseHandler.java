@@ -20,6 +20,8 @@ public class FirebaseHandler {
     ArrayList<CityDetails> cities = new ArrayList<CityDetails>();
     ICities mActivity;
     boolean saved = false;
+    ChildEventListener childEventListener;
+
 
     FirebaseHandler(DatabaseReference db, ICities mActivity){
         this.db = db;
@@ -63,46 +65,48 @@ public class FirebaseHandler {
     }
 
     public ArrayList<CityDetails> retrieveCities(){
-        db.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(!saved) {
-                    saved = true;
-                }
-                cities = getData(dataSnapshot);
-                Log.d("demo","onchildadded returned"+db.toString()+" "+saved);
+        //
+            childEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if (!saved) {
+                        saved = true;
+                    }
+                    cities = getData(dataSnapshot);
+                    Log.d("demo", "onchildadded returned" + db.toString() + " " + saved);
 
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if(saved){
-                    saved = true;
-                }else{
-                    saved = false;
                 }
 
-                cities = getData(dataSnapshot);
-                Log.d("demo","onchildchanged returned"+saved);
-            }
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    if (saved) {
+                        saved = true;
+                    } else {
+                        saved = false;
+                    }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.d("demo","onChildRemoved");
-                cities = removeData(dataSnapshot);
+                    cities = getData(dataSnapshot);
+                    Log.d("demo", "onchildchanged returned" + saved);
+                }
 
-            }
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    Log.d("demo", "onChildRemoved");
+                    cities = removeData(dataSnapshot);
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
 
-            }
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                }
 
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+        db.addChildEventListener(childEventListener);
 
         //db.child("City").child("favorite").orderByValue().equalTo(true);
         Log.d("demo","cities in retrieve details "+cities.toString()+db.toString());
@@ -141,4 +145,11 @@ public class FirebaseHandler {
     public interface ICities{
         public void getCitiesDetails(ArrayList<CityDetails> cities);
     }
+
+    void removeHandler(){
+        db.removeEventListener(childEventListener);
+
+
+    }
+
 }

@@ -14,11 +14,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import org.ocpsoft.prettytime.PrettyTime;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by neha5 on 07-04-2017.
@@ -80,7 +83,21 @@ public class VerticalRecyclerAdapter extends RecyclerView.Adapter<VerticalRecycl
         }else{ //false = C
             holder.textViewTemp.setText("Temperature : " + city.getTempCel()+"°C");
         }
-        holder.textViewUpdatedTime.setText("Last Updated : "+ city.getLastUpdated());
+        Date date = null;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Log.d("demo","Updated String"+city.getLastUpdated());
+        //2017-04-06T18:03:00-04:00
+        Log.d("demo", "format:" + "SubString1:"+city.getLastUpdated().substring(0, 10));
+        String ReDate = city.getLastUpdated().substring(0, 10)+ " " + city.getLastUpdated().substring(11, 18);
+
+        try {
+            date = formatter.parse(ReDate);
+            String timeFormat = new PrettyTime(new Locale("")).format(date);
+            holder.textViewUpdatedTime.setText("Last Updated : "+ timeFormat);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
 
         if(city.isFavorite()){
             holder.imageViewFavorite.setImageResource(R.drawable.star_gold);
