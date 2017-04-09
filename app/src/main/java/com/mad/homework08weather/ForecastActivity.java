@@ -204,6 +204,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             editor.apply();
 
             Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+            startActivity(intent);
             finish();
         }
         if(item.getItemId()==R.id.settingForecast) {
