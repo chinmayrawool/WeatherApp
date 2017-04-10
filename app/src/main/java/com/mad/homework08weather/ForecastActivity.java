@@ -145,7 +145,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
                         ForecastActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(ForecastActivity.this, "cityKey="+cityKey, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(ForecastActivity.this, "cityKey="+cityKey, Toast.LENGTH_SHORT).show();
                                 //http://dataservice.accuweather.com/forecasts/v1/daily/5day/{CITY_UNIQUE_KEY}?apikey={YOUR_API_KEY}
                                 display5dayForecast();
                                 pg.dismiss();
@@ -191,15 +191,10 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
                 Log.d("demo","calling save city onoptionsitemselected");
                 boolean saved = handler.saveCity(city);
 
-                if(found && !saved){
-                    Log.d("demo", "if found true");
-                    Toast.makeText(this, "City updated", Toast.LENGTH_SHORT).show();
-                }else if(saved){
-                    Log.d("demo","if saved true");
-                    Toast.makeText(this, "City saved", Toast.LENGTH_SHORT).show();
-                }else if(!saved){
+                Toast.makeText(this, "City saved", Toast.LENGTH_SHORT).show();
+                /*else if(!saved){
                     Toast.makeText(this, "Saving error", Toast.LENGTH_SHORT).show();
-                }
+                }*/
             }
 
 
@@ -207,7 +202,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
 
         }
         if(item.getItemId()==R.id.setCurrentCity) {
-            Toast.makeText(this, "Set as Current City clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Set as Current City clicked", Toast.LENGTH_SHORT).show();
             // Add to Shared preferences
             editor.putString("pref_current_city", cityName);
             editor.putString("pref_current_country", countryCode);
@@ -219,7 +214,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             finish();
         }
         if(item.getItemId()==R.id.settingForecast) {
-            Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
             // Intent to Preference Activity.
             Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
             startActivity(intent);
@@ -260,7 +255,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
                     @Override
                     public void run() {
                         if(true) {
-                            Toast.makeText(ForecastActivity.this, "In UI thread 5 day forecast", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ForecastActivity.this, "In UI thread 5 day forecast", Toast.LENGTH_SHORT).show();
                             TextView textViewForecastTitle = (TextView) findViewById(R.id.textViewForecastTitle);
                             textViewForecastTitle.setText("Daily Forecast for "+cityName+", "+countryCode);
                             TextView textViewHeadline = (TextView) findViewById(R.id.textViewHeadline);
@@ -297,7 +292,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     }
 
     public void display(final int position){
-        Toast.makeText(ForecastActivity.this, "pos="+position, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(ForecastActivity.this, "pos="+position, Toast.LENGTH_SHORT).show();
 
         //tempCel, lastUpdated
 
