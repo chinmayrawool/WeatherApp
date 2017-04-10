@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
     FirebaseHandler handler;
     LinearLayout linearSavedCity;
     DatabaseReference rbRoot;
-
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +79,6 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preferences.edit();
-        /*preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-
-            }
-        });*/
 
         linearLayout = (LinearLayout) findViewById(R.id.linearMainDisplay);
         pg = new ProgressDialog(MainActivity.this);
@@ -97,13 +91,34 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
 
         Log.d("demo","Cities in main: "+cities.toString());
 
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 
+                Log.d("demo","Shared Preference: String:"+s);
+                if(s.equals("pref_temp_unit")||s.equals("pref_current_city")||s.equals("pref_current_country")){
+                    if(sharedPreferences.getString("pref_temp_unit","").equals("Celcius")){
+                        tempUnit =false;
+                    }else if(sharedPreferences.getString("pref_temp_unit","").equals("Fahrenheit")){
+                        tempUnit =true;
+                    }
+                    displayRefresh();
+                }
+            }
+        };
+
+        preferences.registerOnSharedPreferenceChangeListener(listener);
         client = new OkHttpClient();
         try{
-            cityName = preferences.getString("CITY_NAME", "");
-            countryCode = preferences.getString("COUNTRY_CODE", "");
-            countryName = preferences.getString("COUNTRY_NAME", "");
+            cityName = preferences.getString("pref_current_city", "");
+            countryCode = preferences.getString("pref_current_country", "");
             cityKey = preferences.getString("CITY_KEY", "");
+            String temp = preferences.getString("pref_temp_unit", "");
+            if(temp.equals("Celcius")){
+                tempUnit = false;
+            }else if(temp.equals("Fahrenheit")){
+                tempUnit = true;
+            }
 
             if(!(cityKey.equals("") && cityName.equals("") && countryCode.equals(""))){ //&& countryName.equals("")
                 Log.d("demo","if true");
@@ -183,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
                                         Log.d("demo","key="+cityKey);
                                         //flag =true;
                                         if(cityKey!=null || !(cityKey.equals(""))) {
-                                            editor.putString("CITY_NAME", cityName);
-                                            editor.putString("COUNTRY_CODE", countryCode);
+                                            editor.putString("pref_current_city", cityName);
+                                            editor.putString("pref_current_country", countryCode);
                                             editor.putString("CITY_KEY", cityKey);
                                             editor.apply();
 
@@ -280,9 +295,10 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.settings) {
             Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
+            // Intent to Preference Activity.
             Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
             startActivity(intent);
-            // Intent to Preference Activity.
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -400,5 +416,43 @@ public class MainActivity extends AppCompatActivity implements FirebaseHandler.I
 
     }
 
+    void displayRefresh(){
+        cityName = preferences.getString("pref_current_city","");
+        countryCode = preferences.getString("pref_current_country","");
 
+        Request request = new Request.Builder()
+                .url("http://dataservice.accuweather.com/locations/v1/"+countryCode.trim()+"/search?apikey="+apiKey.trim()+"&q="+cityName.trim())
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // Log.d("demo", response.body().string());
+                String jsonString = response.body().string();
+                Log.d("demo", "1st api=" + jsonString);
+                gson = new Gson();
+                ResponseLocationApi[] locApi = gson.fromJson(jsonString, ResponseLocationApi[].class);
+                Log.d("demo", "Loc API: " + locApi.toString());
+                if(!(locApi[0].getKey().equals("")||locApi[0].getKey().equals(null))){
+                    cityKey = locApi[0].getKey();
+                    editor.putString("CITY_KEY", cityKey);
+                    editor.apply();
+                    displayCurrentWeather();
+                }else{
+                    Toast.makeText(MainActivity.this, "City Key not found", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+    }
 }

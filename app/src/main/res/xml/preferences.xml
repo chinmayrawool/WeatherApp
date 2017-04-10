@@ -7,7 +7,7 @@
         android:entries="@array/temp_units"
         android:entryValues="@array/temp_values"
         android:key="pref_temp_unit"
-        android:summary="Choose between Celcius and Fahrenheit"
+        android:summary="Choose between Celsius and Fahrenheit"
         android:dialogTitle="Choose Temperature Unit"/>
     <EditTextPreference
         android:defaultValue="Default value"
@@ -18,6 +18,14 @@
         android:singleLine="true"
         android:dialogTitle="Enter city details" />
 
+    <EditTextPreference
+        android:defaultValue="Default value"
+        android:selectAllOnFocus="true"
+        android:title="Current Country"
+        android:key="pref_current_country"
+        android:summary="Change Current Country"
+        android:singleLine="true"
+        android:dialogTitle="Enter country details" />
 
 
 

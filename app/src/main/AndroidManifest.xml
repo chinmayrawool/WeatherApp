@@ -28,6 +28,7 @@
         <activity
             android:name=".ForecastActivity"
             android:label="ForeCast" />
+        <activity android:name=".MainPrefActivity"></activity>
     </application>
 
 </manifest>

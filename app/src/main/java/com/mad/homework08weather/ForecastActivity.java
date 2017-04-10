@@ -64,8 +64,8 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     ArrayList<CityDetails> cities;
     boolean favorite = false;
     boolean found = false;
-    public static int count =0;
-
+    public static int count = 0;
+    static boolean tempUnit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +78,17 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preferences.edit();
+
+        try{
+            String temp = preferences.getString("pref_temp_unit", "");
+            if(temp.equals("Celcius")){
+                tempUnit = false;
+            }else if(temp.equals("Fahrenheit")){
+                tempUnit = true;
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -163,7 +174,6 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if(item.getItemId()==R.id.saveCity) {
-            //count ++;
             //Toast.makeText(this, "Save City clicked", Toast.LENGTH_SHORT).show();
             Log.d("demo","Save city clicked");
             //Add city details to Firebase database
@@ -174,6 +184,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             Log.d("demo","retrieving details onoptionsselected");
             cities = handler.retrieveCities();
             Log.d("demo","saved cities"+cities.toString());
+
             Log.d("demo","Count ="+ count);
             if(count == 0){
                 CityDetails city = new CityDetails(cityKey,cityName,countryCode,tempCel,lastUpdated,favorite);
@@ -198,8 +209,8 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
         if(item.getItemId()==R.id.setCurrentCity) {
             Toast.makeText(this, "Set as Current City clicked", Toast.LENGTH_SHORT).show();
             // Add to Shared preferences
-            editor.putString("CITY_NAME", cityName);
-            editor.putString("COUNTRY_CODE", countryCode);
+            editor.putString("pref_current_city", cityName);
+            editor.putString("pref_current_country", countryCode);
             editor.putString("CITY_KEY", cityKey);
             editor.apply();
 
@@ -209,9 +220,10 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
         }
         if(item.getItemId()==R.id.settingForecast) {
             Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
-            /*Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
-            startActivity(intent);*/
             // Intent to Preference Activity.
+            Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+            startActivity(intent);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -313,9 +325,18 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Temperature: ");
-        sb.append(String.valueOf(list.get(position).getTemperature().getMaximum().getValue()));
+        double min = list.get(position).getTemperature().getMinimum().getValue();
+        double max = list.get(position).getTemperature().getMaximum().getValue();
+        if(!tempUnit){
+            min = (min-32)*5.0/9;
+            max = (max-32)*5.0/9;
+            min = Math.round(min*100.0/100.0);
+            max = Math.round(max*100.0/100.0);
+        }
+
+        sb.append(String.valueOf(max));
         sb.append("° / ");
-        sb.append(String.valueOf(list.get(position).getTemperature().getMinimum().getValue()));
+        sb.append(String.valueOf(min));
         sb.append("°");
         TextView textViewTemperature = (TextView) findViewById(R.id.textViewTemperature);
         textViewTemperature.setText(sb.toString());
@@ -340,7 +361,7 @@ public class ForecastActivity extends AppCompatActivity implements RecyclerAdapt
             }
         });
 
-        tempCel = String.valueOf(Math.round(((list.get(0).getTemperature().getMinimum().getValue()-32)*5/9)*100.0/100.0));
+        tempCel = String.valueOf(Math.round(((list.get(0).getTemperature().getMinimum().getValue()-32)*5.0/9)*100.0/100.0));
     }
 
     private String generateUrl(int icon){
